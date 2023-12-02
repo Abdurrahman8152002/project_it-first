@@ -15,10 +15,31 @@ class login_middleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        if (!$request->hasHeader('token')) {
-            return response()->json(['msg' => 'no token found']);
-        }
         $json_data = json_decode(file_get_contents(public_path('users.json')), true);
+        if (!$request->hasHeader('token')) {
+            $email = $request->input(['email']);
+            $password = $request->input(['password']);
+            $found = false;
+            foreach ($json_data as $key => $data) {
+                if ($data['email'] == $email && $data['password'] == $password) {
+                    $found = true;
+                    $token = base64_encode(json_encode(['email' => $email, 'password' => $password]));
+                    $json_data[$key]['token'] = $token;
+                    break;
+                }
+            }
+            if ($found) {
+                file_put_contents('C:\\wamp64\\www\\project\\public\\users.json', json_encode($json_data));
+                $request->attributes->add(['token' => $token]);
+                return $next($request);
+            } else {
+                return response()->json(['msg' => 'Invalid email or password']);
+            }
+
+        }
+
+
+
 
         $token = $request->header('token');
         try {
