@@ -4,41 +4,47 @@ namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
-use function PHPUnit\Framework\isEmpty;
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use Illuminate\Support\Facades\Validator;
 
 class Register_middleware
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     */
-    public function handle(Request $request, Closure $next): Response
+    public function handle(Request $request, Closure $next)
     {
+        $validator = Validator::make($request->all(), [
 
-        $users =json_decode(file_get_contents('C:\wamp64\www\project\public\users.json'), true);
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json($validator->errors(), 400);
+        }
 
         $email = $request->input('email');
         $password = $request->input('password');
-//echo $email;
-if (!isset($email) || !isset($password)){
-    return response()->json(['msg'=>'All fields are required']);
-}
-//echo $email;
-        foreach ($users as $user) {
-            if ($user['email'] == $email) {
-                return response()->json(['message' => 'Email already exists'], 400);
-            }
+
+        if (!isset($email) || !isset($password)){
+            return response()->json(['msg'=>'All fields are required']);
         }
-        $param=$request->all();
-        $token=base64_encode(json_encode($param));
 
-        $users[] = ['email' => $email, 'password' => $password,'token'=>$token];
+        $user = User::where('email', $email)->first();
 
-        file_put_contents('C:\wamp64\www\project\public\users.json', json_encode($users));
-$request->request->add(['token'=>$token]);
+        if ($user) {
+            return response()->json(['message' => 'Email already exists'], 400);
+        }
+
+        $user = User::create([
+            'email' => $email,
+            'password' => Hash::make($password),
+        ]);
+
+        $token = JWTAuth::fromUser($user);
+
+        $request->request->add(['token' => $token]);
+
         return $next($request);
     }
 }
-

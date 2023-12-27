@@ -2,11 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
+use Exception;
 use Illuminate\Http\Request;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
-class User extends Controller
+class UserController extends Controller
 {
     public function register(Request $request){
+
+
         return response()->json([
             'msg' => 'you are registered',
             'data' => [
@@ -35,23 +40,27 @@ class User extends Controller
         if (!$request->hasHeader('token')) {
             return response()->json(['msg' => 'we dont even know you']);
         }
+
         $token = $request->header('token');
-        $json_data=json_decode(file_get_contents('C:\wamp64\www\project\public\users.json'), true);
-        $found = false;
-        foreach ($json_data as $key => &$data) {
-            if ($data['token'] == $token) {
-                $found = true;
-                unset($data['token']); // Remove the token from the user object
-                break;
+        try {
+            $decoded_token = JWTAuth::setToken($token)->getPayload();
+
+            $userId = $decoded_token['sub'];
+
+            $user = User::find($userId);
+
+            if ($user) {
+                // Update user status
+                $user->status = -1;
+                $user->save();
+
+                return response()->json(['msg' => 'Logged out successfully']);
+            } else {
+                return response()->json(['msg' => 'Invalid token']);
             }
+        } catch (Exception $exception) {
+            return response()->json(['msg' => 'An error occurred while processing the token', 'error' => $exception->getMessage()]);
         }
-        if ($found) {
-            file_put_contents('C:\\wamp64\\www\\project\\public\\users.json', json_encode($json_data));
-            return response()->json(['msg' => 'Logged out successfully']);
-        } else {
-            return response()->json(['msg' => 'Invalid token']);
-        }
-
-
     }
+
 }

@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'mysql'),
+    'default' => env('DB_CONNECTION', 'mysql2'),
 
     /*
     |--------------------------------------------------------------------------
@@ -41,6 +41,21 @@ return [
             'database' => env('DB_DATABASE', database_path('database.sqlite')),
             'prefix' => '',
             'foreign_key_constraints' => env('DB_FOREIGN_KEYS', true),
+        ],
+        'mysql2' => [
+            'driver' => 'mysql',
+            'url' => env('DATABASE_URL'),
+            'host' => env('DB_HOST2', '127.0.0.1'),
+            'port' => env('DB_PORT2', '3306'),
+            'database' => env('DB_DATABASE2', 'project'),
+            'username' => env('DB_USERNAME2', 'root'),
+            'password' => env('DB_PASSWORD2', ''),
+            'unix_socket' => env('DB_SOCKET', ''),
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => 'InnoDB',
         ],
 
         'mysql' => [

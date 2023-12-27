@@ -1,0 +1,62 @@
+[
+    {
+        "scientific_name": "paracetamol",
+        "name": "Panadol",
+        "category": "pain_relief",
+        "brand": "Haleon UK Trading Limited",
+        "available_quantity": "100",
+        "expiry_date": "2024-12-31",
+        "price": "20",
+        "description": "used for pain relief , cold and flu symptoms"
+    },
+    {
+        "scientific_name": "Tramadol",
+        "name": "ConZip",
+        "category": "drug",
+        "brand": "Vertical Pharmaceuticals Inc",
+        "available_quantity": "100",
+        "expiry_date": "2024-11-15",
+        "price": "11.59",
+        "description": "Tramadol is a strong pain relief medicine effective for both general and nerve-related pain."
+    },
+    {
+        "scientific_name": "Ibuprofen",
+        "name": "Advil",
+        "category": "pain_relief",
+        "brand": "Pfizer Consumer Healthcare",
+        "available_quantity": "100",
+        "expiry_date": "2024-10-01",
+        "price": "15",
+        "description": "Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID). It works by reducing hormones that cause inflammation and pain in the body"
+    },
+    {
+        "scientific_name": "Naproxen",
+        "name": "Aleve",
+        "category": "drug",
+        "brand": "Bayer HealthCare LLC",
+        "available_quantity": "100",
+        "expiry_date": "2024-08-17",
+        "price": "12",
+        "description": "Naproxen is a nonsteroidal anti-inflammatory drug (NSAID). It works by reducing hormones that cause inflammation and pain in the body"
+    },
+    {
+        "scientific_name": "Meloxicam",
+        "name": "Mobic",
+        "category": "stomach",
+        "brand": "Boehringer Ingelheim Pharmaceuticals, Inc.",
+        "available_quantity": "100",
+        "expiry_date": "2024-07-03",
+        "price": "10",
+        "description": "Meloxicam is a nonsteroidal anti-inflammatory drug (NSAID). It works by reducing hormones that cause inflammation and pain in the body"
+    },
+    {
+        "scientific_name": "pppppppppppppppp",
+        "name": "hhhhhhhhhh",
+        "category": "drug",
+        "brand": "brand1",
+        "available_quantity": "100",
+        "expiry_date": "2024-05-19",
+        "price": "10",
+        "description": "Meloxicam is a nonsteroidal anti-inflammatory drug (NSAID). It works by reducing hormones that cause inflammation and pain in the body"
+    }
+]

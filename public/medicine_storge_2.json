@@ -1,0 +1,42 @@
+[
+    {
+        "scientific_name": "omeprazole",
+        "name": "Prilosec",
+        "category": "GERD treatment",
+        "brand": "AstraZeneca",
+        "available_quantity": "100",
+        "expiry_date": "2024-12-31",
+        "price": "20",
+        "description": "Omeprazole is used to treat symptoms of gastroesophageal reflux disease (GERD) and other conditions caused by excess stomach acid."
+    },
+    {
+        "scientific_name": "pantoprazole",
+        "name": "Protonix",
+        "category": "GERD treatment",
+        "brand": "Pfizer Inc.",
+        "available_quantity": "100",
+        "expiry_date": "2024-11-15",
+        "price": "25",
+        "description": "Pantoprazole is used to treat erosive esophagitis (damage to the esophagus from stomach acid), and other conditions involving excess stomach acid."
+    },
+    {
+        "scientific_name": "famotidine",
+        "name": "Pepcid",
+        "category": "GERD treatment",
+        "brand": "Johnson & Johnson",
+        "available_quantity": "100",
+        "expiry_date": "2024-10-01",
+        "price": "15",
+        "description": "Famotidine is used to treat and prevent ulcers in the stomach and intestines. It also treats conditions in which the stomach produces too much acid."
+    },
+    {
+        "scientific_name": "paracetamol",
+        "name": "Panadol",
+        "category": "pain_relief",
+        "brand": "Haleon UK Trading Limited",
+        "available_quantity": "143",
+        "expiry_date": "2024-08-17",
+        "price": "20",
+        "description": "used for pain relief , cold and flu symptoms"
+    }
+]
