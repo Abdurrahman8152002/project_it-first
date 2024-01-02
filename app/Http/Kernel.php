@@ -3,6 +3,7 @@
 namespace App\Http;
 
 use App\Http\Middleware\Authenticate;
+use App\Http\Middleware\CheckAdmin;
 use App\Http\Middleware\EncryptCookies;
 use App\Http\Middleware\login_middleware;
 use App\Http\Middleware\PreventRequestsDuringMaintenance;
@@ -91,5 +92,6 @@ class Kernel extends HttpKernel
         'verified' => EnsureEmailIsVerified::class,
         'Register_middleware' => Register_middleware::class,
         'login_middleware' => login_middleware::class,
+        'CheckAdmin' => CheckAdmin::class,
     ];
 }

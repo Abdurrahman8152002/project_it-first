@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin;
+use App\Http\Controllers\Sales_Controller;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -18,3 +19,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 Route::post('add_medicine',[Admin::class,'add_medicine']);
+Route::post('/sales', [Sales_Controller::class,'generateReport']);

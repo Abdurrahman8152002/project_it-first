@@ -28,8 +28,7 @@ class UserController extends Controller
         return response()->json([
             'msg' => 'you are logged in',
             'data' => [
-               // 'email' => $request->get('email'),
-                //'password' => $request->get('password'),
+
                 'token' => $request->get('token')
             ]
         ]);
@@ -50,7 +49,7 @@ class UserController extends Controller
             $user = User::find($userId);
 
             if ($user) {
-                // Update user status
+
                 $user->status = -1;
                 $user->save();
 

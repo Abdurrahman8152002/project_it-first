@@ -12,9 +12,9 @@ class Admin extends Controller
         $scientific_name = $request->input('scientific_name');
 
         $name = $request->input('name');
-
+//اعملو ب enum
         $category = $request->input('category');
-//استعمل enum
+
         $brand = $request->input('brand');
 
         $available_quantity = $request->input('available_quantity');
@@ -39,7 +39,7 @@ class Admin extends Controller
             }
         }
 
-//اعمل  update اذا كان موجود
+
             $payload = [
                 "scientific_name" => $scientific_name,
                 "name" => $name,
@@ -51,9 +51,9 @@ class Admin extends Controller
                 "description"=>$description
             ];
 
-$jsonData = file_get_contents('C:\wamp64\www\project\public\medicine_storge_1.json');
 
-$dataArray = json_decode($jsonData, true);
+
+
 
 
 
@@ -64,7 +64,7 @@ $dataArray[] = $payload;
 $jsonData = json_encode($dataArray);
 
 
-file_put_contents('C:\wamp64\www\project\public\medicine_storge_1.json', $jsonData);
+
         return Response()->json(['msg' => 'added successfully']);
         }
 

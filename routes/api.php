@@ -1,10 +1,14 @@
 <?php
 
+use App\Http\Controllers\Medicine_Order;
+use App\Http\Controllers\MedicineController;
+use App\Http\Controllers\Sales_Controller;
 use App\Http\Controllers\Search;
 use App\Http\Controllers\UserController;
+use App\Models\Medicine;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\MedicineController;
+
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -22,13 +26,15 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::post('register',[UserController::class,'register'])->middleware(['Register_middleware']);
 Route::post('login',[UserController::class,'login'])->middleware(['login_middleware']);
 Route::post('logout',[UserController::class,'logout']);
-
-
-
 Route::post('search',[Search::class,'search']);
-
-
-
-
-Route::post('/medicines_2', [MedicineController::class, 'store_2']);
-Route::post('/medicines', [MedicineController::class, 'store']);
+Route::post('order',[Medicine_Order::class,'order']);
+Route::post('/medicines', [MedicineController::class, 'store'])->middleware(['CheckAdmin']);
+Route::post('/orders', [Medicine_Order::class, 'store']);
+Route::get('/orders', [Medicine_Order::class, 'show'])->middleware(['CheckAdmin']);
+Route::post('/orders/details', [Medicine_Order::class, 'index']);
+Route::post('/orders/status', [Medicine_Order::class, 'changeStatus'])->middleware(['CheckAdmin']);
+Route::post('/notify', [Medicine_Order::class, 'getNotification']);
+Route::get('/medicines-or-storages', [MedicineController::class, 'getMedicinesOrStorages']);
+Route::post('/addToFavorite', [Medicine_Order::class, 'putToFavorite']);
+Route::post('/sales', [Sales_Controller::class,'generateReport'])->middleware(['CheckAdmin']);
+Route::post('/Usersales', [Sales_Controller::class,'generateReportUser']);

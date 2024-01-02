@@ -6,6 +6,7 @@ use App\Models\User;
 use Closure;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpFoundation\Response;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Illuminate\Support\Facades\Hash;
@@ -19,6 +20,8 @@ class login_middleware
      */
     public function handle(Request $request, Closure $next): Response
     {
+
+
         if ($request->hasHeader('token')) {
             $token = $request->header('token');
             try {

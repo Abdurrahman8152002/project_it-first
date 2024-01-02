@@ -2,53 +2,39 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Medicine;
+
 use Illuminate\Http\Request;
 
 class Search extends Controller
+
 {
     public function search(Request $request)
     {
-        $json_data = json_decode(file_get_contents(public_path('medicine_storge_1.json')), true);
-        $json_data2 = json_decode(file_get_contents(public_path('medicine_storge_2.json')), true);
+
         $category = $request->input('category');
         $scientific_name = $request->input('name');
 
-        $results = [];
 
-        if ($scientific_name != null) {
-            foreach ($json_data as $data) {
-                if ($data['scientific_name'] == $scientific_name) {
-                    $data['storage'] = 'medicine_storge_1.json';
-                    $results[] = $data;
-                }
-            }
+        $searchField = $scientific_name ? 'scientific_name' : 'category';
+        $searchValue = $scientific_name ? $scientific_name : $category;
 
-            foreach ($json_data2 as $data) {
-                if ($data['scientific_name'] == $scientific_name) {
-                    $data['storage'] = 'medicine_storge_2.json';
-                    $results[] = $data;
-                }
-            }
-        } else if ($category != null) {
-            foreach ($json_data as $data) {
-                if ($data['category'] == $category) {
-                    $data['storage'] = 'medicine_storge_1.json';
-                    $results[] = $data;
-                }
-            }
 
-            foreach ($json_data2 as $data) {
-                if ($data['category'] == $category) {
-                    $data['storage'] = 'medicine_storge_2.json';
-                    $results[] = $data;
-                }
-            }
-        }
+        $medicines = Medicine::where($searchField, $searchValue)->with('storages')->get();
 
-        if (count($results) > 0) {
-            return response()->json(['msg' => 'Found it', 'data' => $results]);
-        } else {
-            return response()->json(['msg' => 'Not found']);
-        }
+
+        $data = [
+            'medicines' => $medicines->map(function ($medicine) {
+                return [
+                    'medicineId' => $medicine->id,
+                    'price' => $medicine->price,
+                    'storages' => $medicine->storages->pluck('name'),
+                ];
+            }),
+        ];
+
+
+        return response()->json($data);
     }
+
 }

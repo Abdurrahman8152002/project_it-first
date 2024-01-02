@@ -15,53 +15,48 @@ use Tymon\JWTAuth\Facades\JWTAuth;
 class Medicine_Order extends Controller
 {
     public function order(Request $request){
-        // Get the authenticated user from the request
+
         $token = $request->header('token');
         $user = JWTAuth::setToken($token)->authenticate();
 
-        // If the user is not authenticated or their status is not 1, return an error
+
         if (!$user || $user->status != 1) {
             return response()->json(['error' => 'Invalid credentials or inactive user'], 401);
         }
 
-        // Rest of your code...
-
-
-
-    // Get the data from the request
         $data = $request->json()->all();
 
         $totalPrice = 0;
         $orderDetails = [];
         $remainingQuantities = [];
         $totalAvailableQuantities = [];
-        $errors = []; // New array to store errors
+        $errors = [];
 
         foreach ($data as $item) {
-            $medicineId = $item['id']; // Change 'name' to 'id'
+            $medicineId = $item['id'];
             $quantityNeeded = $item['quantity'];
 
-            // Initialize the total available quantity for this medicine to 0
-            $totalAvailableQuantities[$medicineId] = 0; // Change 'medicineName' to 'medicineId'
 
-            // Define the storages to search in
-            $storages = [Medicine::class]; // Add more classes if you have more storages
+            $totalAvailableQuantities[$medicineId] = 0;
+
+
+            $storages = [Medicine::class];
 
             foreach ($storages as $storage) {
-                // Get an instance of the storage class
+
                 $storageInstance = resolve($storage);
 
-                // Find the medicine in the current storage
-                $medicineInDB = $storageInstance::where('id', $medicineId)->first(); // Change 'name' to 'id'
+
+                $medicineInDB = $storageInstance::where('id', $medicineId)->first();
 
                 if ($medicineInDB && $medicineInDB->available_quantity > 0) {
-                    // Add the available quantity to the totalAvailableQuantities array
+
                     $totalAvailableQuantities[$medicineId] += $medicineInDB->available_quantity;
                 }
             }
 
             if ($quantityNeeded > $totalAvailableQuantities[$medicineId]) {
-                // Not all of the quantity needed was found in the storages
+
                 $errors[] = [
                     'error' => 'Not enough quantity available for: ' . $medicineId,
                     'total_available_quantity' => $totalAvailableQuantities[$medicineId]
@@ -70,7 +65,7 @@ class Medicine_Order extends Controller
         }
 
         if (!empty($errors)) {
-            // If there are any errors, return them without processing the order
+
             return response()->json($errors, 400);
         }
 
@@ -79,23 +74,22 @@ class Medicine_Order extends Controller
             $quantityNeeded = $item['quantity'];
 
             foreach ($storages as $storage) {
-                // Get an instance of the storage class
-                $storageInstance = resolve($storage);
+                 $storageInstance = resolve($storage);
 
-                // Find the medicine in the current storage
+
                 $medicineInDB = $storageInstance::where('id', $medicineId)->first();
 
                 if ($medicineInDB && $medicineInDB->available_quantity > 0) {
                     $quantityFromThisStorage = min($medicineInDB->available_quantity, $quantityNeeded);
 
-                    // Subtract the quantity from this storage
+
                     $medicineInDB->available_quantity -= $quantityFromThisStorage;
                     $medicineInDB->save();
 
-                    // Add the price for this quantity to the total price
+
                     $totalPrice += $quantityFromThisStorage * $medicineInDB->price;
 
-                    // Add the details to the order details
+
                     $orderDetails[] = [
                         'medicine' => $medicineId,
                         'quantity' => $quantityFromThisStorage,
@@ -104,26 +98,26 @@ class Medicine_Order extends Controller
 
                     ];
 
-                    // Subtract the quantity from this storage from the quantity needed
+
                     $quantityNeeded -= $quantityFromThisStorage;
                 }
 
-                // If the entire quantity needed has been found, stop searching
+
                 if ($quantityNeeded == 0) {
                     break;
                 }
             }
         }
 
-        // Create the order
+
         $order = Order::create([
-            'user_id' => $user->id, // Use the user from the request
+            'user_id' => $user->id,
 
             'total_price' => $totalPrice,
-            'status' => -1, // or whatever default status you want to use
+            'status' => -1,
         ]);
         foreach ($orderDetails as $item) {
-            $medicineId = $item['medicine']; // Change 'name' to 'id'
+            $medicineId = $item['medicine'];
             $quantityNeeded = $item['quantity'];
             $price = $item['price'];
 
@@ -132,48 +126,47 @@ class Medicine_Order extends Controller
                     ['quantity' => DB::raw($quantityNeeded),
                         'price' => DB::raw($price)]]);
         }
-//        $medicineInDB = $storageInstance::where('id', $medicineId)->first();
+
         $admin = User::with('role')->whereHas('role', function($q){
                 $q->where('roles.name','=', 'Admin');
             })->first();
         echo $admin;
-//        $admin = User::class->role()::where('name', 'Admin')->first();
+
 
         Notification::create([
             'user_id'=>$admin->id,
             'message'=>'you have a new order ',
             'seen'=> false
         ]);
-        // If everything goes well, return a success message with the total price and order details
-        // If everything goes well, return a success message with the total price, order details, and remaining quantities
+
         return response()->json([
             'success' => 'Order processed successfully',
             'total_price' => $totalPrice,
-            'order_details' => $orderDetails, // Include order details in the response
-            'remaining_quantities' => $remainingQuantities // Include remaining quantities in the response
+            'order_details' => $orderDetails,
+            'remaining_quantities' => $remainingQuantities
         ], 200);
 
     }
 
     public function changeStatus(Request $request)
     {
-        // Get the order id and the new status from the request
+
         $orderId = $request->input('order_id');
         $newStatus = $request->input('status');
 
         // Find the order by id
         $order = Order::find($orderId);
 
-        // If the order is not found, return an error
+
         if (!$order) {
             return response()->json(['error' => 'Order not found'], 404);
         }
 
-        // Change the status of the order
+
         $order->status = $newStatus;
         $order->save();
 
-        // Load the order details
+
         $order->load('medicines');
         $user = User::with('role')->whereHas('role', function($q){
             $q->where('roles.name','=', 'User');
@@ -191,14 +184,14 @@ class Medicine_Order extends Controller
             'message'=>$message,
             'seen'=> false
         ]);
-        // Prepare the response
+
         $response = [
             'success' => 'Order status updated successfully',
             'order_details' => $order->toArray(),
         ];
 
 
-        // Return the response
+
         return response()->json($response, 200);
     }
 
@@ -211,14 +204,14 @@ return DB::table('medicine_order')
     }
 
     public function index(Request $request){
-        // Get the authenticated user from the request
+
         $token = $request->header('token');
         $user = JWTAuth::setToken($token)->authenticate();
        return DB::table('medicine_order')
             ->join('orders', 'medicine_order.order_id', '=', 'orders.id')
            ->where('orders.user_id', '=', $user->id)
             ->get();
-//        return Order::where('user_id','=',$user->id)->get();
+
 
 
     }
@@ -230,7 +223,7 @@ return DB::table('medicine_order')
         // Authenticate the user
         $user = JWTAuth::setToken($token)->authenticate();
 
-        // If the user is not authenticated or their status is not 1, return an error
+
         if (!$user || $user->status != 1) {
             return response()->json(['error' => 'Invalid credentials or inactive user'], 401);
         }
@@ -240,54 +233,43 @@ return DB::table('medicine_order')
             ->where('seen', 0)
             ->get();
 
-        // Return the notifications
+
         return response()->json($notifications);
     }
     public function putToFavorite (Request $request)
     {
-        // Get the token from the request
+
         $token = $request->header('token');
         $medicine_id = $request->input('medicine_id');
 
-        // Authenticate the user
+
         $user = JWTAuth::setToken($token)->authenticate();
 
-        // If the user is not authenticated or their status is not 1, return an error
+
         if (!$user || $user->status != 1) {
             return response()->json(['error' => 'Invalid credentials or inactive user'], 401);
         }
 
-        // Check if the medicine already exists in the favorites
         $favorite = favorite::where('user_id', $user->id)
             ->where('medicine_id', $medicine_id)
             ->first();
 
         if ($favorite) {
-            // If the medicine is already in the favorites, return a message
+
             return response()->json(['message' => 'The medicine is already in the favorites']);
         } else {
-            // If the medicine is not in the favorites, add it
+
             favorite::create([
                 'user_id' => $user->id,
                 'medicine_id' => $medicine_id
             ]);
 
-            // Return a success message
+
             return response()->json(['message' => 'The medicine has been added to the favorites']);
         }
     }
 
 
 
-}DB::statement('SET FOREIGN_KEY_CHECKS=0;');
-
- DB::table('medicine_storage')->truncate();
- DB::table('medicines')->truncate();
- DB::table('orders')->truncate();
- DB::table('notifications')->truncate();
- DB::table('medicine_order')->truncate();
- DB::table('favorites')->truncate();
-
- DB::statement('SET FOREIGN_KEY_CHECKS=1;');
-
+}
 
